@@ -1,6 +1,8 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
+# define STDOUT 1
+# define STDIN 0
 # include <stddef.h>
 #include <stdlib.h>
 

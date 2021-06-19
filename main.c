@@ -7,6 +7,16 @@
 #include <stdlib.h>
 #include "pipex.h"
 
+int child_process(int fdp)
+{
+
+}
+
+int father_process(int fdp)
+{
+
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	char	*path;
@@ -14,40 +24,72 @@ int main(int argc, char **argv, char **envp)
 	char	**dv;
 	char	**cmd1;
 	int		fd;
-	int		fd1;
 
 	i = 0;
 	if (argc != 5)
-		printf("ERROR\n");
+		perror("");
 	while (envp[i])
 	{
 		if (ft_strncmp("PATH:", envp[i], 5))
 			break;
 		i++;
 	}
-
-	//NEW FUNCTION
 	int fdp[2];
 	if (pipe(fdp) == -1)
 		return (1);
 	int pid;
 
 	pid = fork();
-	if (pid < 0)
-		return (2);
-	if (pid == 0)
+//	if (pid < 0)
+//		return (2);
+//	if (pid == 0)
+//		child_process(fdp[1]);
+//	else
+//		father_process(fdp[0]);
+
+	if (pid)
 	{
-		//fd[1]
-		if ((fd = open(argv[1], O_RDONLY) == -1))
+		wait(0);
+		fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 00774);
+		if (fd < 0)
 		{
-			printf("input file reror\n");
+			perror(argv[4]);
 			exit(2);
 		}
+		if (dup2(fd, STDOUT) < 0)
+			perror("TEXT");
+		if (dup2(fdp[0], STDIN) < 0)
+			perror("TEXT");
 		close(fdp[0]);
-		dup2(fd, STDIN_FILENO);
-		close (fd);
-		if (dup2(fdp[1], STDOUT_FILENO))
-			printf("blabla");
+		close(fdp[1]); 
+		path = envp[i] + 5;
+		dv = ft_split(path, ':');
+		cmd1 = ft_split(argv[3], ' ');
+		int j = 0;
+		char *str;
+		while (dv[j])
+		{
+			str = ft_strjoin(dv[j], "/", cmd1[0]);
+			execve(str, cmd1, envp);
+			j++;
+			free(str);
+		}
+		perror("father");
+	}
+	else
+	{
+		fd = open(argv[1], O_RDONLY);
+		if (fd < 0)
+		{
+			perror(argv[1]);
+			exit(2);
+		}
+		if (dup2(fd, STDIN) < 0)
+			perror("TEXT");
+		//dup2(fdp[1], 1);
+		if (dup2(fdp[1], 1) < 0)
+			perror("ERROR");
+		close(fdp[0]);
 		close(fdp[1]);
 		path = envp[i] + 5;
 		dv = ft_split(path, ':');
@@ -57,40 +99,12 @@ int main(int argc, char **argv, char **envp)
 		while (dv[j])
 		{
 			str = ft_strjoin(dv[j], "/", cmd1[0]);
-			execv(str, cmd1);
+			execve(str, cmd1, envp);
 			j++;
 			free(str);
 		}
-		close(fdp[1]);
+		perror("child");
 	}
-//	else
-	{
-		//fd[0]
 
-		if ((fd = open(argv[4], O_WRONLY) == -1)) {
-			printf("blablabla\n");
-			exit(2);
-		}
-			waitpid(pid, NULL, 0);
-//		wait(NULL);
-		write(2, "abc\n", 4);
-		close(fdp[1]);
-		dup2(fdp[0], STDIN_FILENO);
-		close (fd);
-		if (dup2(fd, STDOUT_FILENO))
-			printf("blabla");
-		close(fdp[0]);
-		path = envp[i] + 5;
-		dv = ft_split(path, ':');
-		cmd1 = ft_split(argv[2], ' ');
-		int j = 0;
-		char *str;
-		while (dv[j])
-		{
-			str = ft_strjoin(dv[j], "/", cmd1[1]);
-			execv(str, cmd1);
-			j++;
-			free(str);
-		}
-	}
+
 }
