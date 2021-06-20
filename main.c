@@ -7,16 +7,6 @@
 #include <stdlib.h>
 #include "pipex.h"
 
-int child_process(int fdp)
-{
-
-}
-
-int father_process(int fdp)
-{
-
-}
-
 int main(int argc, char **argv, char **envp)
 {
 	char	*path;
@@ -40,13 +30,8 @@ int main(int argc, char **argv, char **envp)
 	int pid;
 
 	pid = fork();
-//	if (pid < 0)
-//		return (2);
-//	if (pid == 0)
-//		child_process(fdp[1]);
-//	else
-//		father_process(fdp[0]);
-
+	if (pid < 0)
+		return (2);
 	if (pid)
 	{
 		wait(0);
@@ -87,7 +72,7 @@ int main(int argc, char **argv, char **envp)
 		if (dup2(fd, STDIN) < 0)
 			perror("TEXT");
 		//dup2(fdp[1], 1);
-		if (dup2(fdp[1], 1) < 0)
+		if (dup2(fdp[1], STDOUT) < 0)
 			perror("ERROR");
 		close(fdp[0]);
 		close(fdp[1]);
@@ -105,6 +90,4 @@ int main(int argc, char **argv, char **envp)
 		}
 		perror("child");
 	}
-
-
 }
