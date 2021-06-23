@@ -17,10 +17,10 @@ int main(int argc, char **argv, char **envp)
 
 	i = 0;
 	if (argc != 5)
-		perror("");
+		perror("Not enough arguments");
 	while (envp[i])
 	{
-		if (ft_strncmp("PATH:", envp[i], 5))
+		if ((ft_strncmp("PATH=", envp[i], 5)) == 0)
 			break;
 		i++;
 	}
@@ -46,12 +46,15 @@ int main(int argc, char **argv, char **envp)
 		if (dup2(fdp[0], STDIN) < 0)
 			perror("TEXT");
 		close(fdp[0]);
-		close(fdp[1]); 
+		close(fdp[1]);
 		path = envp[i] + 5;
+		printf("%s", path);
+		printf("%s\n", path);
 		dv = ft_split(path, ':');
 		cmd1 = ft_split(argv[3], ' ');
 		int j = 0;
 		char *str;
+
 		while (dv[j])
 		{
 			str = ft_strjoin(dv[j], "/", cmd1[0]);
@@ -71,13 +74,14 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (dup2(fd, STDIN) < 0)
 			perror("TEXT");
-		//dup2(fdp[1], 1);
 		if (dup2(fdp[1], STDOUT) < 0)
 			perror("ERROR");
 		close(fdp[0]);
 		close(fdp[1]);
+				
 		path = envp[i] + 5;
-		dv = ft_split(path, ':');
+
+		dv = ft_split(path, ':');//seg
 		cmd1 = ft_split(argv[2], ' ');
 		int j = 0;
 		char *str;
