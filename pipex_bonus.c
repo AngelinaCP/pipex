@@ -49,7 +49,7 @@ int main(int argc, char **argv, char **envp)
 	}
 	i = 0;
 	//creating process
-	while (i < num_argc)
+	while (i < num_argc + 1)
 	{
 		pid[i] = fork();
 		if (pid[i] == -1)
@@ -59,40 +59,35 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (pid[i] == 0)
 		{
-
 			fd = open(argv[1], O_RDONLY);
-			if (fd < 0)
-			{
+			if (fd < 0) {
 				perror(argv[1]);
 				exit(2);
 			}
 			if (dup2(fd, STDIN) < 0)
-				perror("TEXT");
-			j = 0;
+				perror("Couldn't read from the file");
 			while (j < num_argc + 1)
 			{
+				if (i == 0)
+					close(fdp[i][0]);
 				if (i != j)
-					close (fdp[j][0]);
-					//open fdp[0][1]
-					//closed fdp[1][1]
-					//closed fdp[2][1]
-				if (i + 1 != j)
 					close(fdp[j][1]);
-					//open fdp[1][0]
-					//closed fdp[1][0]
-					//closed fdp[2][0]
+				if (i != j)
+					close(fdp[j][0]);
 				j++;
 			}
-			//fdp[0][1]
+			if (i != 0 && i != num_argc)
+			{
+				if (dup2(fdp[i][0], STDIN) < 0)
+					perror("Couldn't write to the pipe");
+			}
+			close(fdp[i][0]);
 			if (dup2(fdp[i][1], STDOUT) < 0)
-				perror("error123");
-			//fdp[1][0]
-			if (dup2(fdp[i][0], STDIN) < 0)
-				perror("ERROR2");
-//			close(fdp[i][0]);
-//			close(fdp[i + 1][1]);
-			close(fdp[i + 1][0]);
+				perror("Couldn't read from the pipe");
+			j = 0;
 			close(fdp[i][1]);
+			if (i != num_argc)
+				close(fdp[i][0]);
 			path = envp[count] + 5;
 			dv = ft_split(path, ':');
 			cmd1 = ft_split(argv[2], ' ');
@@ -105,14 +100,17 @@ int main(int argc, char **argv, char **envp)
 				j++;
 				free(str);
 			}
-		perror("child");
+			perror("child");
 			return (0);
 		}
-	i++;
+		i++;
 	}
 	i = 0;
-	while (i++ < num_argc)
+	while (i < num_argc)
+	{
 		wait(NULL);
+		i++;
+	}
 	//return 0;
 	j = 0;
 	while (j < num_argc + 1)
@@ -123,16 +121,19 @@ int main(int argc, char **argv, char **envp)
 			close(fdp[j][1]);
 		j++;
 	}
-	fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 00774);
+	fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 00774);
 	if (fd < 0)
 	{
 		perror(argv[4]);
 		exit(2);
 	}
 	if (dup2(fd, STDOUT) < 0)
-		perror("TEXT");
-	close(fdp[0][1]);
-	close(fdp[num_argc][0]);
+		perror("Couldn't read from the file");
+	//add
+	if (dup2(fdp[num_argc][0], STDIN) < 0)
+		perror("Couldn't read from the pipe");
+//	close(fdp[0][1]);
+//	close(fdp[num_argc][0]);
 	path = envp[count] + 5;
 	dv = ft_split(path, ':');
 	cmd1 = ft_split(argv[3], ' ');

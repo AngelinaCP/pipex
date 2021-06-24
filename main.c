@@ -45,11 +45,9 @@ int main(int argc, char **argv, char **envp)
 			perror("TEXT");
 		if (dup2(fdp[0], STDIN) < 0)
 			perror("TEXT");
-		close(fdp[0]);
-		close(fdp[1]);
+		 close(fdp[0]);
+		 close(fdp[1]);
 		path = envp[i] + 5;
-		printf("%s", path);
-		printf("%s\n", path);
 		dv = ft_split(path, ':');
 		cmd1 = ft_split(argv[3], ' ');
 		int j = 0;
@@ -62,7 +60,7 @@ int main(int argc, char **argv, char **envp)
 			j++;
 			free(str);
 		}
-		perror("father");
+		perror("parent");
 	}
 	else
 	{
