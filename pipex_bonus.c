@@ -49,6 +49,7 @@ int main(int argc, char **argv, char **envp)
 		i++;
 	}
 	i = 0;
+	printf("nargc=%d\n", num_argc);
 	//creating process
 	while (i < num_argc - 1)
 	{
@@ -58,17 +59,24 @@ int main(int argc, char **argv, char **envp)
 			perror("Error with creating process\n");
 			return (3);
 		}
+		printf("i = %d pid=%d\n", i, pid[i]);
+		// write(2, "blabla\n", 7);
 		if (pid[i] == 0)
 		{
 			if (i == 0)
 			{
 				fd = open(argv[1], O_RDONLY);
+<<<<<<< HEAD
 				if (fd < 0)
 				{
+=======
+				if (fd < 0) {
+>>>>>>> fa3db51d8a0ea3c73f4da5cf9f7c897fe0edbacd
 					perror(argv[1]);
 					exit(2);
 				}
 				if(dup2(fd, STDIN) < 0)
+<<<<<<< HEAD
 					perror("Couldn't read from the file");
 			}
 			if (i != 0)
@@ -80,6 +88,40 @@ int main(int argc, char **argv, char **envp)
 			}
 			if (dup2(fdp[i][1], STDOUT) < 0)
 				perror("Couldn't write to the pipe");
+=======
+				perror("Couldn't read from the file");
+			}
+			// j = 0;
+			// while (j < num_argc + 1)
+			// {
+			// 	if (i == 0)
+			// 		close(fdp[i][0]);
+			// 	if (i != j)
+			// 		close(fdp[j][1]);
+			// 	if (i != j)
+			// 		close(fdp[j][0]);
+			// 	j++;
+			// }
+			if (i != 0)
+			{
+				if (dup2(fdp[i - 1][0], STDIN) < 0)
+					perror("Couldn't write to the pipe");
+				close(fdp[i - 1][0]);
+				close(fdp[i - 1][1]);
+				
+			}
+			// close(fdp[i][0]);
+			// if (i != num_argc)
+			// 	close(fdp[i][0]);
+//			if (i != num_argc - 1)
+			{
+			if (dup2(fdp[i][1], STDOUT) < 0)
+				perror("Couldn't read from the pipe");
+			}
+
+
+			j = 0;
+>>>>>>> fa3db51d8a0ea3c73f4da5cf9f7c897fe0edbacd
 			close(fdp[i][0]);
 			close(fdp[i][1]);
 			path = envp[count] + 5;
@@ -87,6 +129,8 @@ int main(int argc, char **argv, char **envp)
 			cmd1 = ft_split(argv[2 + i], ' ');
 			int j = 0;
 			char *str;
+			// printf("run=%d %s\n", num_argc, argv[2 + i]);
+			write(2, "runcmnd\n", 8);
 			while (dv[j])
 			{
 				str = ft_strjoin(dv[j], "/", cmd1[0]);
@@ -97,6 +141,7 @@ int main(int argc, char **argv, char **envp)
 			perror("child");
 			return (0);
 		}
+<<<<<<< HEAD
 		else
 		{
 			wait(0);
@@ -106,6 +151,33 @@ int main(int argc, char **argv, char **envp)
 		}
 		i++;
 	}
+=======
+		
+		else
+		{
+			wait(0);
+			write(2, "dogdal\n", 7);
+		}
+		i++;
+	}
+	// i = 0;
+	// while (i < num_argc - 1)
+	// {
+	// 	wait(NULL);
+	// 	i++;
+	// }
+	//return 0;
+	// j = 0;
+	// while (j < num_argc + 1)
+	// {
+	// 	if (j != num_argc)
+	// 		close (fdp[j][0]);
+	// 	if (j != 0)
+	// 		close(fdp[j][1]);
+	// 	j++;
+	// }
+	write(2, "dogd22\n", 7);
+>>>>>>> fa3db51d8a0ea3c73f4da5cf9f7c897fe0edbacd
 	fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 00774);
 	if (fd < 0)
 	{
@@ -114,6 +186,10 @@ int main(int argc, char **argv, char **envp)
 	}
 	if (dup2(fd, STDOUT) < 0)
 		perror("Couldn't read from the file");
+<<<<<<< HEAD
+=======
+	//add
+>>>>>>> fa3db51d8a0ea3c73f4da5cf9f7c897fe0edbacd
 	if (dup2(fdp[num_argc - 2][0], STDIN) < 0)
 		perror("Couldn't read from the pipe");
 	close(fdp[num_argc - 2][1]);
