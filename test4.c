@@ -56,7 +56,7 @@ int main(int argc, char **argv, char **envp)
 	char *buf;
 	int i;
 	int fdp[2];
-	int	fdp2[2];
+//	int	fdp2[2];
 	int	fd;
 	char **arg[2];
 	int pid;
@@ -68,53 +68,63 @@ int main(int argc, char **argv, char **envp)
 	{
 		if (pipe(fdp) == -1)
 			return (1);
-		else if (pipe(fdp2) == -1)
-			return (2);
 		pid = fork();
 		if (pid < 0)
 			return (3);
+		char c;
 		if (pid == 0)
 		{
-			close(fdp[1]);
+			buf[i] = 0;
+			int i =0;
 			while (ft_strncmp(buf, argv[2], ft_strlen(buf)))
 			{
+				write(1, "> ", 2);
 				get_next_line(0, &buf);
-				if (!(ft_strncmp(buf, argv[2], ft_strlen(buf))))
+//			//	buf[ft_strlen(buf + 1)] = '\0';
+	//			read(0, &c, 1);
+				if ((ft_strncmp(buf, argv[2], ft_strlen(buf))))
 				{
-					write(fdp[0], &buf, ft_strlen(buf));
-					write(fdp[0], "\n", 1);
+//					buf[i] = c;
+//					buf[i] = '\n';
+//					buf[i] = '\0';
+//					write(fdp[1], &buf, ft_strlen(buf));
+write(fdp[1], &buf, ft_strlen(buf));
+//					write(fdp[1], "\n", 1);
+//				//	write(fdp[1], "\0", 1);
+//					buf[ft_strlen(buf + 1)] = '\0';
+					i++;
 				}
+				//while ((ft_strncmp(buf, argv[2], ft_strlen(buf))))
+
+
+
 			}
 			close(fdp[0]);
-			close(fdp2[0]);
-			if (dup2(fdp2[1], STDOUT) < 0)
+			if (dup2(fdp[1], STDOUT) < 0)
 				perror("Couldn't write to the pipe");
-			close(fdp2[1]);
+			close(fdp[1]);
 			do_execve(envp, argv, 1, count);
 			perror("child");
 			return (4);
 		}
 		else
 		{
+			//O_APPEND
 			wait(NULL);
-			close(fdp[0]);
-		//	close (fdp2[1]);
-			fd = open(argv[5], O_WRONLY | O_CREAT | O_TRUNC, 00774);
+			fd = open(argv[5], O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 00774);
 			if (fd < 0)
 			{
 				perror(argv[5]);
 				return (5);
 			}
-			if (dup2(fd, fdp[1]) < 0)
+			if (dup2(fd, STDOUT) < 0)
 				perror("Couldn't write to the file");
-		//	read(fd, &buf, sizeof(buf));
 			close(fdp[1]);
-			close(fdp2[1]);
-			if (dup2(fdp2[0], STDIN) < 0)
+			if (dup2(fdp[0], STDIN) < 0)
 				perror("Couldn't write to the pipe");
-			close(fdp2[0]);
-		//	do_execve(envp, argv, 2, count);
-		//	perror("parent");
+			close(fdp[0]);
+			do_execve(envp, argv, 2, count);
+			perror("parent");
 			return (6);
 		}
 	}

@@ -57,7 +57,7 @@ int main(int argc, char **argv, char **envp)
 
 		while (dv[j])
 		{
-			str = ft_strjoin(dv[j], "/", cmd1[0]);
+			str = ft_strjoin(dv[j], "/", cmd1[]);
 			execve(str, cmd1, envp);
 			j++;
 			free(str);
