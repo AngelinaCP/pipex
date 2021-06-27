@@ -6,178 +6,67 @@
 #include <time.h>
 #include <stdlib.h>
 #include "pipex.h"
+#include "get_next_line.h"
 
-int main(int argc, char **argv, char **envp)
+void init_var(t_list *var, int argc)
 {
-	char	*path;
-	int		i;
-	char	**dv;
-	char	**cmd1;
-	int		fd;
-	int		num_argc;
+//	var->i = 0;
+	var->num_argc = argc - 3;
+}
+void	do_execve(char **envp, char **argv, int i, int count)
+{
+	char *path;
+	char **dv;
+	char **cmd1;
+	char *str;
 	int		j;
-	int		count;
 
-	i = 0;
-	count = 0;
-	num_argc = argc - 3;
-	int 	pid[num_argc + 1];
-	//segfault ./a.out
-	//seeking in current directory
-	if (argc < 5)
+	j = 0;
+	path = envp[count] + 5;
+	dv = ft_split(path, ':');
+	cmd1 = ft_split(argv[2 + i], ' ');
+	while (dv[j])
 	{
-		perror("Not enough arguments");
-		return (1);
+		str = ft_strjoin3(dv[j], "/", cmd1[0]);
+		execve(str, cmd1, envp);
+		j++;
+		//doesn't free when is executed
+		free(str);
 	}
-	while (envp[count])
-	{
-		if ((ft_strncmp("PATH=", envp[count], 5)) == 0)
-			break;
-		count++;
-	}
-	//creating pipes
-	int fdp[num_argc][2];
+}
 
-	i = 0;
-	while (i < num_argc - 1)
-	{
-		if (pipe(fdp[i]) == -1)
-		{
-			perror("Error with creating pipe\n");
-			return (2);
-		}
-		i++;
-	}
-	i = 0;
-	printf("nargc=%d\n", num_argc);
-	//creating process
-	while (i < num_argc - 1)
-	{
-		pid[i] = fork();
-		if (pid[i] == -1)
-		{
-			perror("Error with creating process\n");
-			return (3);
-		}
-		printf("i = %d pid=%d\n", i, pid[i]);
-		// write(2, "blabla\n", 7);
-		if (pid[i] == 0)
-		{
-			if (i == 0)
-			{
-				fd = open(argv[1], O_RDONLY);
-<<<<<<< HEAD
-				if (fd < 0)
-				{
-=======
-				if (fd < 0) {
->>>>>>> fa3db51d8a0ea3c73f4da5cf9f7c897fe0edbacd
-					perror(argv[1]);
-					exit(2);
-				}
-				if(dup2(fd, STDIN) < 0)
-<<<<<<< HEAD
-					perror("Couldn't read from the file");
-			}
-			if (i != 0)
-			{
-				close(fdp[i - 1][1]);
-				if (dup2(fdp[i - 1][0], STDIN) < 0)
-					perror("Couldn't read from the pipe");
-				close(fdp[i - 1][0]);
-			}
-			if (dup2(fdp[i][1], STDOUT) < 0)
-				perror("Couldn't write to the pipe");
-=======
-				perror("Couldn't read from the file");
-			}
-			// j = 0;
-			// while (j < num_argc + 1)
-			// {
-			// 	if (i == 0)
-			// 		close(fdp[i][0]);
-			// 	if (i != j)
-			// 		close(fdp[j][1]);
-			// 	if (i != j)
-			// 		close(fdp[j][0]);
-			// 	j++;
-			// }
-			if (i != 0)
-			{
-				if (dup2(fdp[i - 1][0], STDIN) < 0)
-					perror("Couldn't write to the pipe");
-				close(fdp[i - 1][0]);
-				close(fdp[i - 1][1]);
-				
-			}
-			// close(fdp[i][0]);
-			// if (i != num_argc)
-			// 	close(fdp[i][0]);
-//			if (i != num_argc - 1)
-			{
-			if (dup2(fdp[i][1], STDOUT) < 0)
-				perror("Couldn't read from the pipe");
-			}
+void child_process(char **argv, int i, int fdp[][2])
+{
+	int	fd;
 
+	if (i == 0)
+	{
+		fd = open(argv[1], O_RDONLY);
+		if (fd < 0)
+		{
+			perror(argv[1]);
+			exit(2);
+		}
+		if (dup2(fd, STDIN) < 0)
+			perror("Couldn't read from the file");
+	}
+	if (i != 0)
+	{
+		close(fdp[i - 1][1]);
+		if (dup2(fdp[i - 1][0], STDIN) < 0)
+			perror("Couldn't read from the pipe");
+		close(fdp[i - 1][0]);
+	}
+	if (dup2(fdp[i][1], STDOUT) < 0)
+		perror("Couldn't write to the pipe");
+	close(fdp[i][0]);
+	close(fdp[i][1]);
+}
 
-			j = 0;
->>>>>>> fa3db51d8a0ea3c73f4da5cf9f7c897fe0edbacd
-			close(fdp[i][0]);
-			close(fdp[i][1]);
-			path = envp[count] + 5;
-			dv = ft_split(path, ':');
-			cmd1 = ft_split(argv[2 + i], ' ');
-			int j = 0;
-			char *str;
-			// printf("run=%d %s\n", num_argc, argv[2 + i]);
-			write(2, "runcmnd\n", 8);
-			while (dv[j])
-			{
-				str = ft_strjoin(dv[j], "/", cmd1[0]);
-				 execve(str, cmd1, envp);
-				j++;
-				free(str);
-			}
-			perror("child");
-			return (0);
-		}
-<<<<<<< HEAD
-		else
-		{
-			wait(0);
-			close((fdp[i][1]));
-//			if (i)
-//				close(fdp[i - 1][0]);
-		}
-		i++;
-	}
-=======
-		
-		else
-		{
-			wait(0);
-			write(2, "dogdal\n", 7);
-		}
-		i++;
-	}
-	// i = 0;
-	// while (i < num_argc - 1)
-	// {
-	// 	wait(NULL);
-	// 	i++;
-	// }
-	//return 0;
-	// j = 0;
-	// while (j < num_argc + 1)
-	// {
-	// 	if (j != num_argc)
-	// 		close (fdp[j][0]);
-	// 	if (j != 0)
-	// 		close(fdp[j][1]);
-	// 	j++;
-	// }
-	write(2, "dogd22\n", 7);
->>>>>>> fa3db51d8a0ea3c73f4da5cf9f7c897fe0edbacd
+void parent_process(char **argv, int argc, int fdp[][2], int num_argc)
+{
+	int fd;
+
 	fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 00774);
 	if (fd < 0)
 	{
@@ -186,26 +75,103 @@ int main(int argc, char **argv, char **envp)
 	}
 	if (dup2(fd, STDOUT) < 0)
 		perror("Couldn't read from the file");
-<<<<<<< HEAD
-=======
-	//add
->>>>>>> fa3db51d8a0ea3c73f4da5cf9f7c897fe0edbacd
 	if (dup2(fdp[num_argc - 2][0], STDIN) < 0)
 		perror("Couldn't read from the pipe");
 	close(fdp[num_argc - 2][1]);
 	close(fdp[num_argc - 2][0]);
-	path = envp[count] + 5;
-	dv = ft_split(path, ':');
-	cmd1 = ft_split(argv[i + 2], ' ');
-	int k = 0;
-	char *str;
-	while (dv[k])
-	{
-		str = ft_strjoin(dv[k], "/", cmd1[0]);
+}
 
-		execve(str, cmd1, envp);
-		k++;
-		free(str);
+int find_path(char **envp, int argc)
+{
+	int	count;
+
+	count = 0;
+	if (argc < 5)
+	{
+		perror("Not enough arguments");
+		return (-1);
 	}
+	while (envp[count])
+	{
+		if ((ft_strncmp("PATH=", envp[count], 5)) == 0)
+			break;
+		count++;
+	}
+	return (count);
+}
+
+int exec_process(int argc, char **argv, int count, char **envp, int num_argc)
+{
+	int 	fdp[num_argc][2];
+	int 	pid[num_argc + 1];
+	int	i;
+
+	i = 0;
+	while (i < num_argc - 1)
+	{
+		if (pipe(fdp[i]) == -1)
+		{
+			perror("Error with creating pipe\n");
+			return (1);
+		}
+		i++;
+	}
+	i = 0;
+//	if (do_fork(i, argv, count, envp, argc))
+//		return (2);
+//	return (0);
+	while (i < num_argc - 1)
+	{
+		pid[i] = fork();
+		if (pid[i] == -1)
+		{
+			perror("Error with creating process\n");
+			return (2);
+		}
+		if (pid[i] == 0)
+		{
+			child_process(argv, i, fdp);
+			do_execve(envp, argv, i, count);
+			perror("child");
+			return (3);
+		}
+		else
+		{
+			wait(0);
+			close((fdp[i][1]));
+			if (i)
+				close(fdp[i - 1][0]);
+		}
+		i++;
+	}
+	parent_process(argv, argc, fdp, num_argc);
+	do_execve(envp, argv, i, count);
 	perror("parent");
+	return (0);
+}
+
+int main(int argc, char **argv, char **envp)
+{
+	int		i;
+	int		count;
+	t_list	var;
+	int		num_argc;
+
+	num_argc = argc - 3;
+	i = 0;
+	count = find_path(envp, argc);
+//	void init_var(&var, argc);
+	if (count == -1)
+		return (1);
+	if (argc < 5)
+		perror("Not enough arguments");
+//	if ((argc == 6 && ft_strncmp(argv[1], "here_doc", 8)) == 0)
+//count, envp
+	if (exec_process(argc, argv, count, envp, num_argc))
+		return (2);
+	//segfault ./a.out
+	//seeking in current directory
+	//initialize fds
+	//посмотри права доступа функцией access()
+
 }
