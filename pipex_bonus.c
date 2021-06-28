@@ -29,59 +29,6 @@ void	do_execve(char **envp, char **argv, int i, int count)
 	}
 }
 
-void child_process(char **argv, int i, int fdp[][2])
-{
-	int	fd;
-	char *buf;
-
-	if (i == 0)
-	{
-		//write(2, "ll\n", 3);
-		buf = NULL;
-		close(fdp[i][0]);
-		while(ft_strncmp(buf, argv[2], ft_strlen(argv[2])))
-		{
-			if(get_next_line(0, &buf) && ft_strncmp(buf, argv[2], ft_strlen(argv[2])))
-			{
-				write(fdp[i][1], buf, ft_strlen(buf));
-				write(fdp[i][1], "\n", 1);
-			}
-			free(buf);
-		}
-	}
-	if (i != 0)
-	{
-	//	write(1, "ac", 2);
-		close(fdp[i - 1][1]);
-		if (dup2(fdp[i - 1][0], STDIN) < 0)
-			perror("Couldn't read from the pipe1");
-		close(fdp[i - 1][0]);
-		if (dup2(fdp[i][1], STDOUT) < 0)
-			perror("Couldn't write to the pipe1");
-		close(fdp[i][0]);
-		close(fdp[i][1]);
-	}
-}
-
-//void parent_process(char **argv, int argc, int fdp[][2], int num_argc)
-//{
-//	int fd;
-//
-//	fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 00774);
-//	if (fd < 0)
-//	{
-//		perror(argv[4]);
-//		exit(2);
-//	}
-//	if (dup2(fd, STDOUT) < 0)
-//		perror("Couldn't read from the file");
-//	//changed num-argc - 2
-//	if (dup2(fdp[num_argc - 1][0], STDIN) < 0)
-//		perror("Couldn't read from the pipe2");
-//	close(fdp[num_argc - 2][1]);
-//	close(fdp[num_argc - 2][0]);
-//}
-
 int find_path(char **envp, int argc)
 {
 	int	count;
@@ -106,9 +53,11 @@ int exec_process(int argc, char **argv, int count, char **envp, int num_argc)
 	int 	fdp[num_argc][2];
 	int 	pid;
 	int	i;
+	int fd;
 
 	i = 0;
-	while (i < num_argc)
+	//changed: -1 added
+	while (i < num_argc - 1)
 	{
 		if (pipe(fdp[i]) == -1)
 		{
@@ -131,7 +80,52 @@ int exec_process(int argc, char **argv, int count, char **envp, int num_argc)
 		}
 		if (pid == 0)
 		{
-			child_process(argv, i, fdp);
+			int	fd;
+			char *buf;
+
+			if (i == 0)
+			{
+				//bonus1
+				if (fd = open[argv[1], O_RDONLY])
+				{
+					fd = open(argv[1], O_RDONLY);
+					if (fd < 0)
+					{
+						perror(argv[1]);
+						exit(2);
+					}
+					if (dup2(fd, STDIN) < 0)
+						perror("Couldn't read from the file");
+				}
+				//bonus2
+				else
+				{
+					buf = NULL;
+					close(fdp[i][0]);
+					while(ft_strncmp(buf, argv[2], ft_strlen(argv[2])))
+					{
+						if(get_next_line(0, &buf) && ft_strncmp(buf, argv[2], ft_strlen(argv[2])))
+						{
+							write(fdp[i][1], buf, ft_strlen(buf));
+							write(fdp[i][1], "\n", 1);
+						}
+						free(buf);
+					}
+				}
+
+			}
+			if (i != 0)
+			{
+				//	write(1, "ac", 2);
+				close(fdp[i - 1][1]);
+				if (dup2(fdp[i - 1][0], STDIN) < 0)
+					perror("Couldn't read from the pipe1");
+				close(fdp[i - 1][0]);
+				if (dup2(fdp[i][1], STDOUT) < 0)
+					perror("Couldn't write to the pipe1");
+				close(fdp[i][0]);
+				close(fdp[i][1]);
+			}
 			if (i > 0)
 			{
 				do_execve(envp, argv, i, count);
@@ -149,7 +143,7 @@ int exec_process(int argc, char **argv, int count, char **envp, int num_argc)
 		}
 		i++;
 	}
-	int fd;
+//	int fd;
 
 	fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 00774);
 	if (fd < 0)
@@ -176,18 +170,27 @@ int main(int argc, char **argv, char **envp)
 	t_list	var;
 	int		num_argc;
 
-	num_argc = argc - 4;
+	num_argc = argc - 3;
 	i = 0;
 	count = find_path(envp, argc);
 	if (count == -1)
 		return (1);
-	if (argc < 6 && !ft_strncmp(argv[1], "here_doc", 8))
+	if (argc < 5)
 	{
-		write(1, "Not enough arguments!\n", 22);
+		perror("Not enough arguments");
 		exit(EXIT_FAILURE);
 	}
-	if (exec_process(argc, argv, count, envp, num_argc))
-		return (2);
+	if (!ft_strncmp(argv[1], "here_doc", 8))
+	{
+		if (argc < 6)
+		{
+			perror("Not enough arguments");
+			exit(EXIT_FAILURE);
+		}
+		num_argc = argc - 4;
+	}
+	exec_process(argc, argv, count, envp, num_argc);
+	return (2);
 	//segfault ./a.out
 	//seeking in current directory
 	//initialize fds
