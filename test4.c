@@ -56,76 +56,63 @@ int main(int argc, char **argv, char **envp)
 	char *buf;
 	int i;
 	int fdp[2];
-//	int	fdp2[2];
+	int fdp2[2];
 	int	fd;
 	char **arg[2];
 	int pid;
+	int	pid2;
 	//print here_doc
 	count = find_path(envp, argc);
 	if (count == -1)
 		return (1);
+	fd = open(argv[5], O_WRONLY | O_CREAT | O_TRUNC, 00774);
+	if (fd < 0)
+	{
+		perror(argv[5]);
+		return (5);
+	}
 	if ((argc == 6 && ft_strncmp(argv[1], "here_doc", 8)) == 0)
 	{
 		if (pipe(fdp) == -1)
 			return (1);
+		if (pipe(fdp2) == -1)
+			return (1);
 		pid = fork();
+		if (pid)
+			pid2 = fork();
 		if (pid < 0)
 			return (3);
 		char c;
 		if (pid == 0)
 		{
-			buf[i] = 0;
-			int i =0;
-			while (ft_strncmp(buf, argv[2], ft_strlen(buf)))
-			{
-				write(1, "> ", 2);
-				get_next_line(0, &buf);
-//			//	buf[ft_strlen(buf + 1)] = '\0';
-	//			read(0, &c, 1);
-				if ((ft_strncmp(buf, argv[2], ft_strlen(buf))))
-				{
-//					buf[i] = c;
-//					buf[i] = '\n';
-//					buf[i] = '\0';
-//					write(fdp[1], &buf, ft_strlen(buf));
-write(fdp[1], &buf, ft_strlen(buf));
-//					write(fdp[1], "\n", 1);
-//				//	write(fdp[1], "\0", 1);
-//					buf[ft_strlen(buf + 1)] = '\0';
-					i++;
-				}
-				//while ((ft_strncmp(buf, argv[2], ft_strlen(buf))))
-
-
-
-			}
 			close(fdp[0]);
-			if (dup2(fdp[1], STDOUT) < 0)
-				perror("Couldn't write to the pipe");
-			close(fdp[1]);
+			while (ft_strncmp(buf, argv[2], ft_strlen(argv[2])))
+			{
+				//		write(1, "> ", 2);
+				if (get_next_line(0, &buf) && (ft_strncmp(buf, argv[2], ft_strlen(argv[2]))))
+				{
+					write(fdp[1], &buf, ft_strlen(buf));
+					write(fdp[1], "\n", 1);
+				}
+				free(buf);
+			}
+			return (0);
+		}
+		else if (pid2 == 0)
+		{
+
 			do_execve(envp, argv, 1, count);
 			perror("child");
-			return (4);
+			return (0);
 		}
-		else
-		{
-			//O_APPEND
-			wait(NULL);
-			fd = open(argv[5], O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 00774);
-			if (fd < 0)
-			{
-				perror(argv[5]);
-				return (5);
-			}
-			if (dup2(fd, STDOUT) < 0)
-				perror("Couldn't write to the file");
-			close(fdp[1]);
-			if (dup2(fdp[0], STDIN) < 0)
-				perror("Couldn't write to the pipe");
-			close(fdp[0]);
-			do_execve(envp, argv, 2, count);
-			perror("parent");
-			return (6);
-		}
+		//O_APPEND
+		waitpid(pid, NULL, 0);
+		waitpid(pid2, NULL, 0);
+		close(fdp[1]);
+		dup2(fdp[0], STDIN);
+		dup2(fd, STDOUT);
+		do_execve(envp, argv, 2, count);
+		perror("parent");
+		return (6);
 	}
 }
