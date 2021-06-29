@@ -6,11 +6,12 @@
 # include <stddef.h>
 # include <stdlib.h>
 
-typedef struct s_list
+typedef struct s_arg
 {
-	int num_argc;
-//	int i;
-} t_list ;
+	int	pp[2];
+	int count;
+	int	flag;
+} t_arg ;
 
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int 	main(int argc, char **argv, char **envp);

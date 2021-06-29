@@ -8,11 +8,6 @@
 #include "pipex.h"
 #include "get_next_line.h"
 
-void init_var(t_list *var, int argc)
-{
-//	var->i = 0;
-	var->num_argc = argc - 3;
-}
 void	do_execve(char **envp, char **argv, int i, int count)
 {
 	char *path;
@@ -33,52 +28,6 @@ void	do_execve(char **envp, char **argv, int i, int count)
 		//doesn't free when is executed
 		free(str);
 	}
-}
-
-void child_process(char **argv, int i, int fdp[][2])
-{
-	int	fd;
-
-	if (i == 0)
-	{
-		fd = open(argv[1], O_RDONLY);
-		if (fd < 0)
-		{
-			perror(argv[1]);
-			exit(2);
-		}
-		if (dup2(fd, STDIN) < 0)
-			perror("Couldn't read from the file");
-	}
-	if (i != 0)
-	{
-		close(fdp[i - 1][1]);
-		if (dup2(fdp[i - 1][0], STDIN) < 0)
-			perror("Couldn't read from the pipe");
-		close(fdp[i - 1][0]);
-	}
-	if (dup2(fdp[i][1], STDOUT) < 0)
-		perror("Couldn't write to the pipe");
-	close(fdp[i][0]);
-	close(fdp[i][1]);
-}
-
-void parent_process(char **argv, int argc, int fdp[][2], int num_argc)
-{
-	int fd;
-
-	fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 00774);
-	if (fd < 0)
-	{
-		perror(argv[4]);
-		exit(2);
-	}
-	if (dup2(fd, STDOUT) < 0)
-		perror("Couldn't read from the file");
-	if (dup2(fdp[num_argc - 2][0], STDIN) < 0)
-		perror("Couldn't read from the pipe");
-	close(fdp[num_argc - 2][1]);
-	close(fdp[num_argc - 2][0]);
 }
 
 int find_path(char **envp, int argc)
@@ -130,7 +79,30 @@ int exec_process(int argc, char **argv, int count, char **envp, int num_argc)
 		}
 		if (pid[i] == 0)
 		{
-			child_process(argv, i, fdp);
+			int	fd;
+
+			if (i == 0)
+			{
+				fd = open(argv[1], O_RDONLY);
+				if (fd < 0)
+				{
+					perror(argv[1]);
+					exit(2);
+				}
+				if (dup2(fd, STDIN) < 0)
+					perror("Couldn't read from the file");
+			}
+			if (i != 0)
+			{
+				close(fdp[i - 1][1]);
+				if (dup2(fdp[i - 1][0], STDIN) < 0)
+					perror("Couldn't read from the pipe");
+				close(fdp[i - 1][0]);
+			}
+			if (dup2(fdp[i][1], STDOUT) < 0)
+				perror("Couldn't write to the pipe");
+			close(fdp[i][0]);
+			close(fdp[i][1]);
 			do_execve(envp, argv, i, count);
 			perror("child");
 			return (3);
@@ -144,7 +116,20 @@ int exec_process(int argc, char **argv, int count, char **envp, int num_argc)
 		}
 		i++;
 	}
-	parent_process(argv, argc, fdp, num_argc);
+	int fd;
+
+	fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 00774);
+	if (fd < 0)
+	{
+		perror(argv[4]);
+		exit(2);
+	}
+	if (dup2(fd, STDOUT) < 0)
+		perror("Couldn't read from the file");
+	if (dup2(fdp[num_argc - 2][0], STDIN) < 0)
+		perror("Couldn't read from the pipe");
+	close(fdp[num_argc - 2][1]);
+	close(fdp[num_argc - 2][0]);
 	do_execve(envp, argv, i, count);
 	perror("parent");
 	return (0);
@@ -154,7 +139,6 @@ int main(int argc, char **argv, char **envp)
 {
 	int		i;
 	int		count;
-	t_list	var;
 	int		num_argc;
 
 	num_argc = argc - 3;
