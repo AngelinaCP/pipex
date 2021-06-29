@@ -6,53 +6,54 @@
 #    By: ddelena <ddelena@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/19 17:46:16 by ddelena           #+#    #+#              #
-#    Updated: 2021/06/30 01:44:01 by ddelena          ###   ########.fr        #
+#    Updated: 2021/06/30 02:32:43 by ddelena          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS	=	pipex.c  ft_split.c ft_strncmp.c  \
+SRCS	=	main.c  ft_split.c ft_strncmp.c  \
 			child_process.c process_exec.c ft_strjoin.c \
 			get_next_line.c get_next_line_utils.c
 
 SRCS_bonus	=	ft_split.c ft_strjoin.c ft_strncmp.c  \
-                pipex_bonus.c  child_process.c process_exec.c \
+                main_bonus.c  child_process.c process_exec.c \
                 get_next_line.c get_next_line_utils.c
 
-HEAD	= pipex.h
+HEAD		=		pipex.h
 
 OBJC    	=       ${SRCS:.c=.o}
 
-OBJCB	= ${SRCS_bonus:.c=.o}
+OBJCB    	=		${SRCS_bonus:.c=.o}
 
-NAME	= pipex
+NAME		=       pipex
 
-NAME_B 	= pipex_bonus
+NAMEB		=       pipex_bonus
 
-CC		= gcc
+CC      	=       gcc
 
-CFLAGS	= -Wall -Wextra -Werror
+FLAGS		=		-Wall -Wextra -Werror
 
+RM			=       rm -rf
 
-%.o : %.c   $(HEAD)
-			$(CC) $(CFLAGS) -c $< -o ${<:.c=.o}
+%.o:%.c 		$(HEAD)
+				$(CC) $(FLAGS) -c $< -o ${<:.c=.o}
 
-all:		$(NAME)
+all:            $(NAME)
 
-$(NAME):	$(HEAD) $(OBJC)
-			$(CC) $(OBJC) -o $(NAME)
+$(NAME):        $(OBJC)
+				$(CC) $(OBJC)  -o $(NAME)
 
 bonus:			$(NAMEB)
 
-$(NAME_B):		$(OBJCB)
-				$(CC) $(OBJCB) -o $(NAME_B)
+$(NAMEB):		$(OBJCB)
+				gcc -c $(SRCS_bonus)
+				$(CC) $(OBJCB) -o $(NAMEB)
 
 clean:
-		rm -f ${OBJS} ${OBJCB}
+				${RM} ${OBJC} ${OBJCB}
 
-fclean:	clean
-		rm -f ${NAME} ${NAMEB}
+fclean:			clean
+				${RM} ${NAME} ${NAMEB}
 
+re:				fclean	all
 
-re:		fclean all
-
-.PHONY:	all, clean, fclean, re bonus
+.PHONY:			all clean fclean re bonus
