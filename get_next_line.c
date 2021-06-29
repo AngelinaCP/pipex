@@ -1,4 +1,5 @@
-#include "get_next_line.h"
+#include "pipex.h"
+#define BUFFER_SIZE 1048576
 
 char	*next_line(char **start_l, char **line)
 {

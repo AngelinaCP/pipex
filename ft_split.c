@@ -6,12 +6,25 @@
 /*   By: ddelena <ddelena@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/23 16:39:30 by ddelena           #+#    #+#             */
-/*   Updated: 2021/04/30 00:33:45 by ddelena          ###   ########.fr       */
+/*   Updated: 2021/06/30 01:37:15 by ddelena          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include <stdio.h>
+
+static char	**ft_malloc_error(char **out)
+{
+	unsigned int	i;
+
+	i = 0;
+	while (out[i])
+	{
+		free(out[i]);
+		i++;
+	}
+	free(out);
+	return (NULL);
+}
 
 static int	ft_count_words(const char *s, char c)
 {
@@ -41,7 +54,7 @@ static char	**ft_spl(char **out, const char *s, char c)
 	while (*s)
 	{
 		while (*s && *s == c)
-			s++; 
+			s++;
 		i = 0;
 		while (*s && *s != c && i++ >= 0)
 			s++;
@@ -63,8 +76,11 @@ char	**ft_split(char const *s, char c)
 	char	**out;
 
 	out = malloc(sizeof(char *) * (ft_count_words(s, c) + 1));
-	if (out == NULL)
+	if (!out)
+	{
+		ft_malloc_error(out);
 		return (NULL);
+	}
 	if (s == NULL)
 	{
 		out[0] = "\0";
