@@ -108,7 +108,6 @@ int main(int argc, char **argv, char **envp)
 		write(2, "Wrong number of arguments\n", 26);
 		return (1);
 	}
-
 	while (envp[i])
 	{
 		if ((ft_strncmp("PATH=", envp[i], 5)) == 0)

@@ -22,6 +22,7 @@ typedef struct s_arg
 	int num_argc;
 } t_arg ;
 
+int		ft_strcmp(const char *s1, const char *s2);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int 	main(int argc, char **argv, char **envp);
 char	**ft_split(char const *s, char c);

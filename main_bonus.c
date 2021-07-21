@@ -77,7 +77,8 @@ int main(int argc, char **argv, char **envp)
 		write(2, "Wrong number of arguments\n", 26);
 		exit(EXIT_FAILURE);
 	}
-	if (!ft_strncmp(argv[1], "here_doc", 8)) {
+	if (!(ft_strcmp("here_doc", argv[1])))
+	{
 		if (argc < 6)
 		{
 			write(2, "Wrong number of arguments\n", 26);

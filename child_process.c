@@ -6,7 +6,7 @@ void	child_limiter(t_arg *fdp, char **argv)
 
 	buf = NULL;
 	close(fdp[fdp->i].pp[0]);
-	while (ft_strncmp(buf, argv[2], ft_strlen(argv[2])))
+	while (ft_strcmp(buf, argv[2]))
 	{
 		if (get_next_line(0, &buf) && ft_strncmp(buf, argv[2],
 				ft_strlen(argv[2])))
@@ -38,11 +38,11 @@ void	child_mult_pipes(t_arg *fdp)
 	{
 		close(fdp[fdp->i - 1].pp[1]);
 		if (dup2(fdp[fdp->i - 1].pp[0], STDIN) < 0)
-			perror("Couldn't read from the pipe1");
+			perror("Couldn't read from the pipe");
 		close(fdp[fdp->i - 1].pp[0]);
 	}
 	if (dup2(fdp[fdp->i].pp[1], STDOUT) < 0)
-		perror("Couldn't write to the pipe1");
+		perror("Couldn't write to the pipe");
 	close(fdp[fdp->i].pp[0]);
 	close(fdp [fdp->i].pp[1]);
 }

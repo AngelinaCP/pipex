@@ -12,11 +12,11 @@
 
 SRCS	=	main.c  ft_split.c ft_strncmp.c  \
 			child_process.c process_exec.c ft_strjoin.c \
-			get_next_line.c get_next_line_utils.c
+			get_next_line.c get_next_line_utils.c ft_strcmp.c
 
 SRCS_bonus	=	ft_split.c ft_strjoin.c ft_strncmp.c  \
                 main_bonus.c  child_process.c process_exec.c \
-                get_next_line.c get_next_line_utils.c
+                get_next_line.c get_next_line_utils.c ft_strcmp.c
 
 HEAD		=		pipex.h
 

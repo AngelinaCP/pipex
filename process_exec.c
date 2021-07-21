@@ -12,7 +12,7 @@ void	do_execve(char **envp, char **argv, int i, t_arg *fdp)
 	j = 0;
 	path = envp[fdp->count] + 5;
 	dv = ft_split(path, ':');
-	cmd1 = ft_split(argv[2 + i], ' ');
+	cmd1 = ft_split(argv[i  + 2], ' ');
 	while (dv[j])
 	{
 		str = ft_strjoin(dv[j], "/");
@@ -42,10 +42,13 @@ int parent_process(t_arg *fdp, char **argv, char **envp, int argc)
 	if (dup2(fd, STDOUT) < 0)
 		perror("Couldn't read from the file");
 	if (dup2(fdp[fdp->num_argc - 2].pp[0], STDIN) < 0)
-		perror("Couldn't read from the pipe2");
+		perror("Couldn't read from the pipe");
 	close(fdp[fdp->num_argc - 2].pp[1]);
 	close(fdp[fdp->num_argc - 2].pp[0]);
-	do_execve(envp, argv, fdp->i, fdp);
+	if (fdp->flag == 1)
+		do_execve(envp, argv, fdp->i + 1, fdp);
+	else
+		do_execve(envp, argv, fdp->i, fdp);
 	perror("parent");
 	return (0);
 }
