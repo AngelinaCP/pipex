@@ -1,8 +1,6 @@
-
 #include "pipex.h"
 
-
-int create_pipes(t_arg *fdp)
+int	create_pipes(t_arg *fdp)
 {
 	fdp->i = 0;
 	while (fdp->i < fdp->num_argc - 1)
@@ -17,7 +15,7 @@ int create_pipes(t_arg *fdp)
 	return (0);
 }
 
-int find_path(char **envp, int argc, t_arg *fdp)
+int	find_path(char **envp, int argc, t_arg *fdp)
 {
 	fdp->count = 0;
 	if (argc < 5)
@@ -28,16 +26,15 @@ int find_path(char **envp, int argc, t_arg *fdp)
 	while (envp[fdp->count])
 	{
 		if ((ft_strncmp("PATH=", envp[fdp->count], 5)) == 0)
-			break;
+			break ;
 		fdp->count++;
 	}
 	return (fdp->count);
 }
 
-
-int fork_and_child(t_arg *fdp, char **argv, char **envp)
+int	fork_and_child(t_arg *fdp, char **argv, char **envp)
 {
-	int pid;
+	int	pid;
 
 	while (fdp->i < fdp->num_argc - 1)
 	{
@@ -54,7 +51,7 @@ int fork_and_child(t_arg *fdp, char **argv, char **envp)
 	return (0);
 }
 
-int exec_process(int argc, char **argv, char **envp, t_arg *fdp)
+int	exec_process(int argc, char **argv, char **envp, t_arg *fdp)
 {
 	if (create_pipes(fdp))
 		return (1);
@@ -64,9 +61,9 @@ int exec_process(int argc, char **argv, char **envp, t_arg *fdp)
 	return (parent_process(fdp, argv, envp, argc));
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-	t_arg *fdp;
+	t_arg	*fdp;
 
 	fdp = (t_arg *) malloc(sizeof(t_arg) * argc);
 	fdp->num_argc = argc - 3;
@@ -85,7 +82,7 @@ int main(int argc, char **argv, char **envp)
 			exit(EXIT_FAILURE);
 		}
 		fdp->flag = 1;
-		fdp->num_argc = argc - 4;
+		fdp->num_argc = argc - 3;
 	}
 	if (exec_process(argc, argv, envp, fdp))
 		return (2);

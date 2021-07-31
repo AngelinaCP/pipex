@@ -7,9 +7,9 @@
 #include <stdlib.h>
 #include "pipex.h"
 
-void child_process1(int fdp[2], char **argv)
+void	child_process1(int fdp[2], char **argv)
 {
-	int fd;
+	int	fd;
 
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
@@ -25,9 +25,9 @@ void child_process1(int fdp[2], char **argv)
 	close(fdp[1]);
 }
 
-void parent_process1(int fdp[2], char **argv)
+void	parent_process1(int fdp[2], char **argv)
 {
-	int fd;
+	int	fd;
 
 	fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 00774);
 	if (fd < 0)
@@ -44,35 +44,32 @@ void parent_process1(int fdp[2], char **argv)
 	close(fdp[1]);
 }
 
-
-void execute_process(char **envp, char *argv, int i)
+void	execute_process(char **envp, char *argv, int i)
 {
 	char	*path;
-	char 	**dv;
+	char	**dv;
 	char	**cmd;
-	int 	j;
-	char 	*str;
-	char 	*str2;
+	char	*str;
+	char	*str2;
 
-	j = 0;
 	path = envp[i] + 5;
 	dv = ft_split(path, ':');
 	cmd = ft_split(argv, ' ');
-	while (dv[j])
+	while (*dv)
 	{
-		str = ft_strjoin(dv[j], "/");
+		str = ft_strjoin(*dv, "/");
 		str2 = ft_strjoin(str, cmd[0]);
 		execve(str2, cmd, envp);
-		j++;
+		dv++;
 		free(str);
 		free(str2);
 	}
 }
 
-int fork_proc(char **argv, char **envp, int i)
+int	fork_proc(char **argv, char **envp, int i)
 {
 	int	pid;
-	int fdp[2];
+	int	fdp[2];
 
 	if (pipe(fdp) == -1)
 		return (2);
@@ -98,7 +95,7 @@ int fork_proc(char **argv, char **envp, int i)
 	return (0);
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
 	int		i;
 
@@ -111,7 +108,7 @@ int main(int argc, char **argv, char **envp)
 	while (envp[i])
 	{
 		if ((ft_strncmp("PATH=", envp[i], 5)) == 0)
-			break;
+			break ;
 		i++;
 	}
 	if (fork_proc(argv, envp, i))

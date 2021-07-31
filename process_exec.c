@@ -2,23 +2,21 @@
 
 void	do_execve(char **envp, char **argv, int i, t_arg *fdp)
 {
-	char *path;
-	char **dv;
-	char **cmd1;
-	char *str;
+	char	*path;
+	char	**dv;
+	char	**cmd1;
+	char	*str;
 	char	*str2;
-	int		j;
 
-	j = 0;
 	path = envp[fdp->count] + 5;
 	dv = ft_split(path, ':');
-	cmd1 = ft_split(argv[i  + 2], ' ');
-	while (dv[j])
+	cmd1 = ft_split(argv[i + 1], ' ');
+	while (*dv)
 	{
-		str = ft_strjoin(dv[j], "/");
+		str = ft_strjoin(*dv, "/");
 		str2 = ft_strjoin(str, cmd1[0]);
 		execve(str2, cmd1, envp);
-		j++;
+		dv++;
 		free(str);
 		free(str2);
 	}
@@ -26,9 +24,9 @@ void	do_execve(char **envp, char **argv, int i, t_arg *fdp)
 	free (cmd1);
 }
 
-int parent_process(t_arg *fdp, char **argv, char **envp, int argc)
+int	parent_process(t_arg *fdp, char **argv, char **envp, int argc)
 {
-	int fd;
+	int	fd;
 
 	if (fdp->flag == 1)
 		fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 00774);
@@ -48,7 +46,7 @@ int parent_process(t_arg *fdp, char **argv, char **envp, int argc)
 	if (fdp->flag == 1)
 		do_execve(envp, argv, fdp->i + 1, fdp);
 	else
-		do_execve(envp, argv, fdp->i, fdp);
+		do_execve(envp, argv, fdp->i + 1, fdp);
 	perror("parent");
 	return (0);
 }

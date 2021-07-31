@@ -56,7 +56,7 @@ int	child_exec(t_arg *fdp, char **envp, char **argv)
 	}
 	else if (fdp->flag != 1)
 	{
-		do_execve(envp, argv, fdp->i, fdp);
+		do_execve(envp, argv, fdp->i + 1, fdp);
 		perror("child");
 	}
 	return (1);

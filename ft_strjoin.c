@@ -6,7 +6,7 @@
 /*   By: ddelena <ddelena@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/24 04:45:14 by ddelena           #+#    #+#             */
-/*   Updated: 2021/06/30 01:50:23 by ddelena          ###   ########.fr       */
+/*   Updated: 2021/07/31 15:23:35 by ddelena          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@ size_t	ft_strlen(const char *str)
 	return (i);
 }
 
-char 	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
 	int		i;
 	int		j;
+	char	*str;
 
 	i = 0;
 	j = 0;
-	char	*str;
 	if (!s1 || !s2)
 		return (NULL);
 	str = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2)));
