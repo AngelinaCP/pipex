@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <time.h>
-#include <stdlib.h>
 #include "pipex.h"
 
 void	child_process1(int fdp[2], char **argv)
